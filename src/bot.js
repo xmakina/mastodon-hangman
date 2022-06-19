@@ -3,12 +3,20 @@ const Mastodon = require('mastodon-api')
 const Mongo = require('mongodb')
 const MentionHandler = require('./MentionHandler')
 
+const {
+    CLIENT_KEY,
+    CLIENT_SECRET,
+    ACCESS_TOKEN,
+    API_URL,
+    LOG_MESSAGES
+} = process.env
+
 const M = new Mastodon({
-    client_key: 'sVM1vHGbzgSFqLpaTW6OPJW-j845xSRH3syfYWu8BR0',
-    client_secret: 'nAqXR0AIvw0LI0bt3cKVtmnGBPT0_-HXg-cujaWsPNI',
-    access_token: 'P-GjK3q_5CZGwqTGUf7qMewzKIJDP9w1Z3eKTbU76vc',
+    client_key: CLIENT_KEY,
+    client_secret: CLIENT_SECRET,
+    access_token: ACCESS_TOKEN,
     timeout_ms: 60 * 1000,  // optional HTTP request timeout to apply to all requests.
-    api_url: 'https://botsin.space/api/v1/', // optional, defaults to https://mastodon.social/api/v1/
+    api_url: API_URL, // optional, defaults to https://mastodon.social/api/v1/
 })
 
 async function CheckConnection() {
@@ -17,7 +25,7 @@ async function CheckConnection() {
         MONGO_PASSWORD,
         MONGO_HOSTNAME
     } = process.env;
-    
+
     const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOSTNAME}/?authSource=admin`;
 
     const client = new Mongo.MongoClient(url);
@@ -43,8 +51,10 @@ listener.on('message', msg => HandleMessage(msg))
 listener.on('error', err => console.log(err))
 
 function LogMessage(msg) {
-    fs.writeFileSync(`./log/data${new Date().getTime()}.json`, JSON.stringify(msg, null, 2));
-    console.log('message logged')
+    if (LOG_MESSAGES) {
+        fs.writeFileSync(`./log/data${new Date().getTime()}.json`, JSON.stringify(msg, null, 2));
+        console.log('message logged')
+    }
 }
 
 async function RespondToMessage(message) {
