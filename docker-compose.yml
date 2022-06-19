@@ -11,7 +11,6 @@ services:
       - './data:/data/db'
   bot:
     build: .
-    command: npm run dev
     env_file: ./.env
     environment:
       - MONGO_USERNAME=$MONGO_USERNAME
